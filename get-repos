@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import re
-from github import Github
-from tempfile import gettempdir
+import sys
+from argparse import ArgumentParser
 from beaker.cache import CacheManager
 from beaker.util import parse_cache_config_options
+from github import Github
+from tempfile import gettempdir
 
 cache_dir = '%s/get-repos' % gettempdir()
 
@@ -24,7 +26,7 @@ def get_repos(name):
     return [repo for repo in repo_owner.get_repos()]  # iterate to fetch all the pages
 
 
-def get_repo_names(name, pattern=None):
+def get_repo_names(name, pattern):
     repos = get_repos(name)
     names = [repo.name for repo in repos if re.search(pattern, repo.name)]
     names.sort()
@@ -32,20 +34,17 @@ def get_repo_names(name, pattern=None):
 
 
 def _parse_args():
-    from argparse import ArgumentParser
     parser = ArgumentParser(description='List public repos of a Github user.')
     parser.add_argument('name', help='the name of the Github user')
     parser.add_argument(
         '-p, --pattern',
         dest='pattern',
-        nargs=1,
         help='a regex pattern to match repo names against',
         default='.*'
     )
     parser.add_argument(
         '-f, --format',
         dest='format',
-        nargs=1,
         help='a format string to use for each line',
         default='%s'
     )
@@ -59,8 +58,6 @@ def _parse_args():
 
 
 def main():
-    import sys
-
     args = _parse_args()
 
     if args.format.count('%s') != 1:
