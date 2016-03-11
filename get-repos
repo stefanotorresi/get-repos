@@ -32,16 +32,42 @@ def get_repo_names(org_name, pattern=None):
 
 
 def main():
+    import sys
     from argparse import ArgumentParser
 
-    parser = ArgumentParser(description='List public repos of a Github organization.')
-    parser.add_argument('org_name', metavar='ORG', help='the name of the organization')
-    parser.add_argument('pattern', metavar='PATTERN', nargs='?', help='a pattern to match repo names against', default='.*')
+    parser = ArgumentParser(
+        description='List public repos of a Github organization.'
+    )
+    parser.add_argument(
+        'org_name',
+        metavar='ORG',
+        help='the name of the organization'
+    )
+    parser.add_argument(
+        '-p, --pattern',
+        dest='pattern',
+        metavar='PATTERN',
+        nargs='?',
+        help='a regex pattern to match repo names against',
+        default='.*'
+    )
+    parser.add_argument(
+        '-f, --format',
+        dest='format',
+        metavar='FORMAT',
+        nargs='?',
+        help='the output format for each line',
+        default='%s'
+    )
 
-    args = vars(parser.parse_args())
+    args = parser.parse_args()
 
-    for name in get_repo_names(**args):
-        print "- [ ] " + name
+    if args.format.count('%s') != 1:
+        print "FORMAT must contain exactly one '%s' placeholder"
+        sys.exit(1)
+
+    for name in get_repo_names(args.org_name, args.pattern):
+        print args.format % name
 
 
 if __name__ == "__main__":
