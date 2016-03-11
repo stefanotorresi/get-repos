@@ -52,7 +52,7 @@ def _parse_args():
         '-c, --clear-cache',
         dest='clear_cache',
         action='store_true',
-        help='invalidates the cache in %s' % cache_dir,
+        help='invalidates the cache',
     )
     return parser.parse_args()
 

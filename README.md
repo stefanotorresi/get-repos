@@ -15,5 +15,20 @@ optional arguments:
   -p, --pattern PATTERN
                         a regex pattern to match repo names against
   -f, --format FORMAT   a format string to use for each line
-  -c, --clear-cache     invalidates the cache in /tmp/get-repos
+  -c, --clear-cache     invalidates the cache
+```
+
+## Example
+
+```
+$ ./get-repos stefanotorresi -p '^thorr-'
+thorr-advent
+thorr-ansible-user-playbook
+thorr-fib
+thorr-nonce
+thorr-oauth2
+thorr-oauth2-cli
+thorr-oauth2-doctrine
+thorr-persistence
+thorr-persistence-doctrine
 ```
