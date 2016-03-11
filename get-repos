@@ -20,22 +20,22 @@ cache_manager = CacheManager(**parse_cache_config_options(cache_opts))
 
 
 @cache_manager.cache('repos')
-def get_repos(name):
+def get_repos(username):
     github = Github()
-    repo_owner = github.get_user(name)
+    repo_owner = github.get_user(username)
     return [repo for repo in repo_owner.get_repos()]  # iterate to fetch all the pages
 
 
-def get_repo_names(name, pattern):
-    repos = get_repos(name)
-    names = [repo.name for repo in repos if re.search(pattern, repo.name)]
-    names.sort()
-    return names
+def get_repo_names(username, pattern):
+    repos = get_repos(username)
+    repo_names = [repo.name for repo in repos if re.search(pattern, repo.name)]
+    repo_names.sort()
+    return repo_names
 
 
 def _parse_args():
     parser = ArgumentParser(description='List public repos of a Github user.')
-    parser.add_argument('name', help='the name of the Github user')
+    parser.add_argument('username', help='the name of the Github user')
     parser.add_argument(
         '-p, --pattern',
         dest='pattern',
@@ -65,9 +65,11 @@ def main():
         sys.exit(1)
 
     if args.clear_cache:
-        cache_manager.invalidate(get_repos, 'repos', args.name)
+        cache_manager.invalidate(get_repos, 'repos', args.username)
 
-    for name in get_repo_names(args.name, args.pattern):
+    repo_names = get_repo_names(args.username, args.pattern)
+
+    for name in repo_names:
         print args.format % name
 
 

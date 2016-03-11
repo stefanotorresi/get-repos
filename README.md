@@ -3,12 +3,12 @@
 ```
 usage: get-repos [-h] [-p, --pattern PATTERN] [-f, --format FORMAT]
                  [-c, --clear-cache]
-                 name
+                 username
 
 List public repos of a Github user.
 
 positional arguments:
-  name                  the name of the Github user
+  username              the name of the Github user
 
 optional arguments:
   -h, --help            show this help message and exit
