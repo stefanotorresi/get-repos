@@ -5,7 +5,7 @@ from tempfile import gettempdir
 from beaker.cache import CacheManager
 from beaker.util import parse_cache_config_options
 
-cache_dir = '%s/%s/cache' % (gettempdir(), __file__)
+cache_dir = '%s/get-repos' % gettempdir()
 
 cache_opts = {
     'cache.type': 'file',
@@ -18,55 +18,59 @@ cache_manager = CacheManager(**parse_cache_config_options(cache_opts))
 
 
 @cache_manager.cache('repos')
-def get_repos(org_name):
+def get_repos(name):
     github = Github()
-    org = github.get_organization(org_name)
-    return [repo for repo in org.get_repos()]  # iterate to execute http requests
+    repo_owner = github.get_user(name)
+    return [repo for repo in repo_owner.get_repos()]  # iterate to fetch all the pages
 
 
-def get_repo_names(org_name, pattern=None):
-    repos = get_repos(org_name)
+def get_repo_names(name, pattern=None):
+    repos = get_repos(name)
     names = [repo.name for repo in repos if re.search(pattern, repo.name)]
     names.sort()
     return names
 
 
-def main():
-    import sys
+def _parse_args():
     from argparse import ArgumentParser
-
-    parser = ArgumentParser(
-        description='List public repos of a Github organization.'
-    )
-    parser.add_argument(
-        'org_name',
-        metavar='ORG',
-        help='the name of the organization'
-    )
+    parser = ArgumentParser(description='List public repos of a Github user.')
+    parser.add_argument('name', help='the name of the Github user')
     parser.add_argument(
         '-p, --pattern',
         dest='pattern',
-        metavar='PATTERN',
-        nargs='?',
+        nargs=1,
         help='a regex pattern to match repo names against',
         default='.*'
     )
     parser.add_argument(
         '-f, --format',
         dest='format',
-        metavar='FORMAT',
-        nargs='?',
-        help='the output format for each line',
+        nargs=1,
+        help='a format string to use for each line',
         default='%s'
     )
+    parser.add_argument(
+        '-c, --clear-cache',
+        dest='clear_cache',
+        action='store_true',
+        help='invalidates the cache in %s' % cache_dir,
+    )
+    return parser.parse_args()
 
-    args = parser.parse_args()
+
+def main():
+    import sys
+
+    args = _parse_args()
 
     if args.format.count('%s') != 1:
         print "FORMAT must contain exactly one '%s' placeholder"
         sys.exit(1)
 
-    for name in get_repo_names(args.org_name, args.pattern):
+    if args.clear_cache:
+        cache_manager.invalidate(get_repos, 'repos', args.name)
+
+    for name in get_repo_names(args.name, args.pattern):
         print args.format % name
 
 
