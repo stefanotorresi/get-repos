@@ -61,7 +61,7 @@ def main():
     args = _parse_args()
 
     if args.format.count('%s') != 1:
-        print "FORMAT must contain exactly one '%s' placeholder"
+        print("FORMAT must contain exactly one '%s' placeholder")
         sys.exit(1)
 
     if args.clear_cache:
@@ -70,7 +70,7 @@ def main():
     repo_names = get_repo_names(args.username, args.pattern)
 
     for name in repo_names:
-        print args.format % name
+        print(args.format % name)
 
 
 if __name__ == "__main__":
